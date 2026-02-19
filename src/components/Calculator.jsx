@@ -17,7 +17,7 @@ export default function Calculator() {
     blerp: '',
     kicks: ''
   });
-  const [outputUnit, setOutputUnit] = useState('minutes');
+  const [outputUnit, setOutputUnit] = useState('hours');
 
   const activeConfig = TYPE_CONFIG.find(t => t.id === inputType);
 
