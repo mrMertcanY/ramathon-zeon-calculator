@@ -8,6 +8,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Calculator from './components/Calculator';
 import TimeAdder from './components/TimeAdder';
+import CustomScrollbar from './components/CustomScrollbar';
 import theme from './theme';
 
 function App() {
@@ -40,21 +41,18 @@ function App() {
       <CssBaseline />
       <Box
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: '100vh',
+          width: '100vw',
           background: 'radial-gradient(ellipse at top, rgba(26, 5, 5, 0.8) 0%, transparent 100%)', // Subtle red tint at top, transparent for grid
           position: 'relative',
           overflow: 'hidden',
           '&::before': {
             content: '""',
-            position: 'fixed',
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            height: '100%',
             background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, rgba(239, 68, 68, 0.15), transparent 40%)`,
             pointerEvents: 'none',
             zIndex: 0,
@@ -62,11 +60,11 @@ function App() {
           },
           '&::after': {
             content: '""',
-            position: 'fixed',
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            height: '100%',
             backgroundImage: `
               linear-gradient(rgba(239, 68, 68, 0.4) 1px, transparent 1px),
               linear-gradient(90deg, rgba(239, 68, 68, 0.4) 1px, transparent 1px)
@@ -82,39 +80,52 @@ function App() {
           }
         }}
       >
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1, py: 4 }}>
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em' }}>
-              Ramathon <Box component="span" sx={{ color: 'primary.main' }}>Zeon</Box>
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 500 }}>
-              Yayın Süresi Hesaplayıcı
-            </Typography>
-          </Box>
+        <CustomScrollbar>
+          <Box 
+            sx={{ 
+              minHeight: '100%', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              py: { xs: 4, sm: 8 }
+            }}
+          >
+            <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+              <Box sx={{ mb: 4, textAlign: 'center' }}>
+                <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em' }}>
+                  Ramathon <Box component="span" sx={{ color: 'primary.main' }}>Zeon</Box>
+                </Typography>
+                <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  Yayın Süresi Hesaplayıcı
+                </Typography>
+              </Box>
 
-          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-            <Tabs 
-              value={tabIndex} 
-              onChange={handleTabChange} 
-              textColor="primary"
-              indicatorColor="primary"
-              sx={{ 
-                '& .MuiTab-root': { color: 'text.secondary', fontWeight: 700 },
-                '& .Mui-selected': { color: 'white' }
-              }}
-            >
-              <Tab label="Süre Ekle" />
-              <Tab label="Toplam Süre" />
-            </Tabs>
-          </Box>
+              <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+                <Tabs 
+                  value={tabIndex} 
+                  onChange={handleTabChange} 
+                  textColor="primary"
+                  indicatorColor="primary"
+                  sx={{ 
+                    '& .MuiTab-root': { color: 'text.secondary', fontWeight: 700 },
+                    '& .Mui-selected': { color: 'white' }
+                  }}
+                >
+                  <Tab label="Süre Ekle" />
+                  <Tab label="Toplam Süre" />
+                </Tabs>
+              </Box>
 
-          <Box sx={{ display: tabIndex === 0 ? 'block' : 'none' }}>
-            <Calculator />
+              <Box sx={{ display: tabIndex === 0 ? 'block' : 'none' }}>
+                <Calculator />
+              </Box>
+              <Box sx={{ display: tabIndex === 1 ? 'block' : 'none' }}>
+                <TimeAdder />
+              </Box>
+            </Container>
           </Box>
-          <Box sx={{ display: tabIndex === 1 ? 'block' : 'none' }}>
-            <TimeAdder />
-          </Box>
-        </Container>
+        </CustomScrollbar>
       </Box>
     </ThemeProvider>
   );
