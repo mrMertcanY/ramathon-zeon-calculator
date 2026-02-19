@@ -32,25 +32,21 @@ export default function Calculator() {
 
   const currentInputValue = inputValues[inputType];
 
-  const result = useMemo(() => {
+  const calculatedTime = useMemo(() => {
     const val = parseFloat(currentInputValue);
-    if (isNaN(val) || val < 0) return 0;
+    if (isNaN(val) || val < 0) return { h: 0, m: 0, s: 0, totalM: 0, totalS: 0 };
 
-    const minutes = val * RATES[inputType];
+    const totalMinutes = val * RATES[inputType];
+    const totalSeconds = Math.round(totalMinutes * 60);
 
-    if (outputUnit === 'hours') return minutes / 60;
-    if (outputUnit === 'seconds') return minutes * 60;
-    return minutes;
-  }, [inputType, currentInputValue, outputUnit]);
-
-  // Format the result
-  const formattedResult = useMemo(() => {
-    if (result === 0) return "0";
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
     
-    // For integers or clean decimals, don't show too many places
-    const str = result.toFixed(2);
-    return str.endsWith('.00') ? str.slice(0, -3) : str;
-  }, [result]);
+    const totalM = Math.floor(totalSeconds / 60);
+    
+    return { h, m, s, totalM, totalS: totalSeconds };
+  }, [inputType, currentInputValue]);
 
   return (
     <Box sx={{ width: '100%', maxWidth: 480, mx: 'auto' }}>
@@ -96,26 +92,40 @@ export default function Calculator() {
             <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontWeight: 500 }}>
               Hesaplanan Süre
             </Typography>
-            <Typography 
-              variant="h2" 
-              component="div" 
-              color="common.white"
-              sx={{ 
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                textShadow: '0 4px 12px rgba(0,0,0,0.5)'
-              }}
-            >
-              {formattedResult}
-              <Typography 
-                component="span" 
-                variant="h5" 
-                color="primary" 
-                sx={{ ml: 1, fontWeight: 700 }}
-              >
-                {outputUnit === 'hours' ? 'sa' : outputUnit === 'minutes' ? 'dk' : 'sn'}
-              </Typography>
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+              {outputUnit === 'hours' ? (
+                <>
+                  <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {calculatedTime.h}
+                    <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>sa</Typography>
+                  </Typography>
+                  <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {calculatedTime.m}
+                    <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>dk</Typography>
+                  </Typography>
+                  <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {calculatedTime.s}
+                    <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>sn</Typography>
+                  </Typography>
+                </>
+              ) : outputUnit === 'minutes' ? (
+                <>
+                  <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {calculatedTime.totalM}
+                    <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>dk</Typography>
+                  </Typography>
+                  <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {calculatedTime.s}
+                    <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>sn</Typography>
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="h2" component="div" color="common.white" sx={{ letterSpacing: '-0.02em', lineHeight: 1, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                  {calculatedTime.totalS}
+                  <Typography component="span" variant="h5" color="primary" sx={{ ml: 1, fontWeight: 700 }}>sn</Typography>
+                </Typography>
+              )}
+            </Box>
           </Box>
 
           <UnitSelector activeUnit={outputUnit} onChange={setOutputUnit} />
