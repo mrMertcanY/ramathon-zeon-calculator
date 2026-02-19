@@ -16,6 +16,15 @@
   --color-accent-secondary: var(--color-accent-secondary);
 }
 
+::selection {
+  background-color: rgba(239, 68, 68, 0.4);
+  color: white;
+}
+::-moz-selection {
+  background-color: rgba(239, 68, 68, 0.4);
+  color: white;
+}
+
 body {
   background-color: var(--color-primary);
   background-image: 

@@ -12,6 +12,7 @@ import theme from './theme';
 
 function App() {
   const [tabIndex, setTabIndex] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0, y: 0 });
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -23,8 +24,15 @@ function App() {
         document.activeElement.blur();
       }
     };
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
     document.addEventListener("wheel", handleWheel, { passive: false });
-    return () => document.removeEventListener("wheel", handleWheel);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      document.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   return (
@@ -42,15 +50,35 @@ function App() {
           overflow: 'hidden',
           '&::before': {
             content: '""',
-            position: 'absolute',
+            position: 'fixed',
             top: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100%',
-            maxWidth: '1200px',
-            height: '100%',
-            background: 'radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.15) 0%, transparent 50%)',
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, rgba(239, 68, 68, 0.15), transparent 40%)`,
             pointerEvents: 'none',
+            zIndex: 0,
+            transition: 'background 0.1s ease',
+          },
+          '&::after': {
+            content: '""',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: `
+              linear-gradient(rgba(239, 68, 68, 0.4) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(239, 68, 68, 0.4) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            maskImage: `radial-gradient(250px circle at ${mousePos.x}px ${mousePos.y}px, black, transparent 100%)`,
+            WebkitMaskImage: `radial-gradient(250px circle at ${mousePos.x}px ${mousePos.y}px, black, transparent 100%)`,
+            pointerEvents: 'none',
+            zIndex: 0,
+            // Create the 3D pop effect
+            transform: `scale(1.1)`,
+            transformOrigin: `${mousePos.x}px ${mousePos.y}px`,
           }
         }}
       >
