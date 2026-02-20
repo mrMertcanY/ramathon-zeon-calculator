@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -7,13 +7,16 @@ import Container from '@mui/material/Container';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Calculator from './components/Calculator';
-import TimeAdder from './components/TimeAdder';
 import CustomScrollbar from './components/CustomScrollbar';
+import ThreeBackground from './components/ThreeBackground';
+import MiniGames from './components/MiniGames';
 import theme from './theme';
+import TimeAdder from './components/TimeAdder';
 
 function App() {
   const [tabIndex, setTabIndex] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0, y: 0 });
+  const [gamesOpen, setGamesOpen] = useState(false);
+  const containerRef = useRef(null);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -25,40 +28,59 @@ function App() {
         document.activeElement.blur();
       }
     };
+
+    let isThrottled = false;
     const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      // Performans optimizasyonu: Oyun açıkken mouse işlemini iptal et
+      if (gamesOpen) return;
+      if (isThrottled) return;
+      isThrottled = true;
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.style.setProperty('--mouse-x', `${e.clientX}px`);
+          containerRef.current.style.setProperty('--mouse-y', `${e.clientY}px`);
+        }
+        isThrottled = false;
+      });
     };
+
     document.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("mousemove", handleMouseMove);
     return () => {
       document.removeEventListener("wheel", handleWheel);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [gamesOpen]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box
+        ref={containerRef}
+        style={{
+          '--mouse-x': `${typeof window !== 'undefined' ? window.innerWidth / 2 : 0}px`,
+          '--mouse-y': '0px'
+        }}
         sx={{
           height: '100vh',
           width: '100vw',
           background: 'radial-gradient(ellipse at top, rgba(26, 5, 5, 0.8) 0%, transparent 100%)', // Subtle red tint at top, transparent for grid
           position: 'relative',
           overflow: 'hidden',
-          '&::before': {
+          '&::before': gamesOpen ? { display: 'none' } : {
             content: '""',
             position: 'absolute',
             top: 0,
             left: 0,
             width: '100%',
             height: '100%',
-            background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, rgba(239, 68, 68, 0.15), transparent 40%)`,
+            // Kırmızı glow, daha küçük alan (350px -> 250px)
+            background: `radial-gradient(250px circle at var(--mouse-x) var(--mouse-y), rgba(239, 68, 68, 0.4), transparent 60%)`,
             pointerEvents: 'none',
             zIndex: 0,
-            transition: 'background 0.1s ease',
+            transition: 'opacity 0.1s ease',
           },
-          '&::after': {
+          '&::after': gamesOpen ? { display: 'none' } : {
             content: '""',
             position: 'absolute',
             top: 0,
@@ -70,16 +92,19 @@ function App() {
               linear-gradient(90deg, rgba(239, 68, 68, 0.4) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px',
-            maskImage: `radial-gradient(250px circle at ${mousePos.x}px ${mousePos.y}px, black, transparent 100%)`,
-            WebkitMaskImage: `radial-gradient(250px circle at ${mousePos.x}px ${mousePos.y}px, black, transparent 100%)`,
+            // Daha küçük maske alanı (350px -> 200px)
+            maskImage: `radial-gradient(200px circle at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), transparent 100%)`,
+            WebkitMaskImage: `radial-gradient(200px circle at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), transparent 100%)`,
             pointerEvents: 'none',
             zIndex: 0,
-            // Create the 3D pop effect
-            transform: `scale(1.1)`,
-            transformOrigin: `${mousePos.x}px ${mousePos.y}px`,
+            // 3D pop efekti (scale 1.1 -> 1.2 ve transform origin ile)
+            transform: `scale(1.2)`,
+            transformOrigin: `var(--mouse-x) var(--mouse-y)`,
+            transition: 'opacity 0.1s ease',
           }
         }}
       >
+        <ThreeBackground />
         <CustomScrollbar>
           <Box 
             sx={{ 
@@ -126,6 +151,7 @@ function App() {
             </Container>
           </Box>
         </CustomScrollbar>
+        <MiniGames onOpenChange={setGamesOpen} />
       </Box>
     </ThemeProvider>
   );
