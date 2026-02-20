@@ -8,7 +8,6 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Calculator from './components/Calculator';
 import CustomScrollbar from './components/CustomScrollbar';
-import ThreeBackground from './components/ThreeBackground';
 import MiniGames from './components/MiniGames';
 import theme from './theme';
 import TimeAdder from './components/TimeAdder';
@@ -104,7 +103,21 @@ function App() {
           }
         }}
       >
-        <ThreeBackground />
+        <Box 
+          component="img"
+          src="/logo/faviconremovebg.png"
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: 0.15, // Subtle background effect
+            width: '80%',
+            maxWidth: '600px',
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+        />
         <CustomScrollbar>
           <Box 
             sx={{ 
