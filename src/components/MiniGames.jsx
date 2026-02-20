@@ -113,7 +113,7 @@ export default function MiniGames({ onOpenChange }) {
 
 // Menu Selection View
 function GameMenu({ setActiveGame }) {
-  const reactionHighScore = localStorage.getItem('minigame_reaction_hs') || '-';
+  const reactionHighScore = localStorage.getItem('minigame_reaction_hs') || '0';
   const clickerHighScore = localStorage.getItem('minigame_clicker_hs') || '0';
 
   return (
