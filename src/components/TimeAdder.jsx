@@ -28,7 +28,7 @@ const TimeInput = ({ label, value, onChange }) => (
 );
 
 // Fixed finish date: 18.02.2026 - 18:36
-const START_DATE = new Date('2026-02-18T18:36:00'); 
+const START_DATE = new Date('2026-02-18T18:36:12'); 
 
 export default function TimeAdder() {
   const [currentTime, setCurrentTime] = useState(new Date());
