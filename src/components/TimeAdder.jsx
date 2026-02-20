@@ -51,10 +51,26 @@ export default function TimeAdder() {
   }, [currentTime]);
 
   const [addTime, setAddTime] = useState({ days: '', hours: '', minutes: '', seconds: '' });
+  const [lockedTime, setLockedTime] = useState(null);
 
   const handleAddChange = (field) => (event) => {
-    setAddTime({ ...addTime, [field]: event.target.value });
+    const newValue = event.target.value;
+    const newAddTime = { ...addTime, [field]: newValue };
+    setAddTime(newAddTime);
+
+    const isAddingTime = Object.values(newAddTime).some(val => val !== '');
+    setLockedTime(prev => {
+      if (isAddingTime && !prev) return new Date();
+      if (!isAddingTime) return null;
+      return prev;
+    });
   };
+
+  const baseTimeForCalc = lockedTime || currentTime;
+
+  const effectiveElapsedSec = useMemo(() => {
+    return Math.max(0, Math.floor((baseTimeForCalc - START_DATE) / 1000));
+  }, [baseTimeForCalc]);
 
   const totalDuration = useMemo(() => {
     const getSeconds = (t) => {
@@ -65,7 +81,7 @@ export default function TimeAdder() {
       return d + h + m + s;
     };
 
-    const totalSec = elapsedDuration.totalSeconds + getSeconds(addTime);
+    const totalSec = effectiveElapsedSec + getSeconds(addTime);
 
     // Calculate total hours directly instead of separating days for the RESULT
     const h = Math.floor(totalSec / 3600);
@@ -73,7 +89,7 @@ export default function TimeAdder() {
     const s = totalSec % 60;
 
     return { h, m, s, totalSec };
-  }, [elapsedDuration, addTime]);
+  }, [effectiveElapsedSec, addTime]);
 
   const endDateInfo = useMemo(() => {
     const endDate = new Date(START_DATE.getTime() + totalDuration.totalSec * 1000);
